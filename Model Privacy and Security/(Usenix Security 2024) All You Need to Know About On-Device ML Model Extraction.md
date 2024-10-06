@@ -23,7 +23,7 @@ Attacker's perspective:
   - These model files can be either usable plaintext models or encrypted and obfuscated models. Attackers can directly utilize plaintext models or employ decryption and deobfuscation tools to reverse the plaintext model.
 - Device-based attacks. They access the IoT devices and gain access to the memory.
   - Attackers can either force a vulnerable application to launch and load ML models into memory or consistently scan the memory to wait for models to be loaded.
-  - **Plaintext copies of ML models will eventually be loaded into memory** so that the vulnerable application can actually use the models.
+  - **Plaintext copies of ML models will be loaded into memory** so that the vulnerable application can use them.
   - Attackers also assume to have **knowledge of the in-memory format of models**.
 - Communication-based attacks. Attackers can intercept communication between various memory regions and hardware architectures on an IoT device. Attackers assume to leverage these data to recover partial or complete details of ML models.
 - Model-based attacks. Attackers send (selective) input queries to the models and observe the ML inference results.
