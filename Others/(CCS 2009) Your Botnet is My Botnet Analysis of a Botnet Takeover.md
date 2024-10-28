@@ -2,9 +2,25 @@
 
 This paper talks about a takeover of the **Torpig** botnet and a study of its operations for a period of ten days.
 
+#### Definitions
+
+![image-20241018171025918](./assets/image-20241018171025918.png)
+
+(A Survey of Botnet and Botnet Detection by Feily and Shahrestani)
+
+A typical botnet can be created and maintained in five phases including: initial infection, secondary injection, connection, malicious command and control, update and maintenance.
+
+1. Initial infection: the attacker scans a target machines for known vulnerability, and infects victim machines through different exploitation methods. Torpig: by malicious web pages.
+2. Secondary injection: the infected hosts execute shell-code, which the image of the actual bot binary from the specific location via FTP, HTTP, or P2P. The bot binary installs itself on the target machine.
+3. Connection: the bot program establishes a command and control (C&C) channel, and connects to the C&C server.
+4. Command and control: botmaster uses the C&C channel to disseminate commands to the bot army. 
+5. Update and maintenance: for evading detection, adding new functionalities, changing C&C servers in order to keep alive
+
 #### Introduction
 
-Once a host is infected with a bot, the victim host will join a **botnet**, a network that is control by the **botmaster**. Botnets are used for sending spams, launching denial-of-service attacks, or stealing personal data such as mail accounts or bank credentials. In this paper, they perform *passive analysis* of secondary effects that are caused by the activity of compromised machines. A more active approach to study botnets is **infiltration** - using an actual malware sample or a client simulating a bot, researchers join a botnet to perform analysis *from the inside*:
+Once a host is infected with a bot, the victim host will join a **botnet**, a network that is control by the **botmaster**. Botnets are used for sending spams, launching denial-of-service attacks, or stealing personal data such as mail accounts or bank credentials. 
+
+Approaches for understanding Botnet includes *passive analysis* of secondary effects that are caused by the activity of compromised machines. A more active approach to study botnets is **infiltration** - using an actual malware sample or a client simulating a bot, researchers join a botnet to perform analysis *from the inside*:
 
 - They use **honeypots**, **honey clients**, or **spam traps** to obtain a copy of a malware sample.
 
@@ -22,6 +38,7 @@ Once a host is infected with a bot, the victim host will join a **botnet**, a ne
     > **Internet Relay Chat**, a client-server protocol that allows real-time text communication over the internet. [RFC1459](https://www.rfc-editor.org/rfc/rfc1459.html).
 
     > - Especially widely used for group chats.
+    > - Bots would connect to specific IRC channels, where the botmaster issued commands to all bots simultaneously.
     > - No longer widely used now.
 
 Due to the open, decentralized nature of peer-topeer (P2P) protocols, it is possible to infiltrate P2P botnets such as Storm.
@@ -33,12 +50,12 @@ To overcome the limitations of passive measurements and infiltration, one can at
 
 - Physical seize the machines by law enforcement agencies.
 - Collaborate with domain registrars or DNS providers to tamper with the mapping of a botnet domain to point to somewhere the defender controls.
-- Some botnets like Torpig use **domain flex**, which means each bot periodically generates a list of domains that it contacts idependently.
+- Some botnets like Torpig use **domain flex**, which means each bot periodically generates a list of domains that it contacts independently.
   - The bot contacts each of them one by one and stay in contact with the first that responds before the next iteration starts.
   - Reversing engineering the domain generation algorithm enable us to register domains that the bot may contact.
   - We can act like a bot master to get information from the bot.
 
-In this paper describes their experience in actively seizing control of the Torpig botnet for ten days.
+This paper describes their experience in actively seizing control of the Torpig botnet for ten days.
 
 Some certain properties in the analysis:
 
@@ -50,7 +67,7 @@ Some certain properties in the analysis:
 
 How is Torpig distributed:
 
-- Via **Mebroot**: a a rootkit that takes control of a machine by replacing the system’s Master Boot Record (MBR). The Mebroot is executed before the OS is loaded and remains undetected by anti-virus tools.
+- Via **Mebroot**: a rootkit that takes control of a machine by replacing the system’s Master Boot Record (MBR). The Mebroot is executed before the OS is loaded and remains undetected by anti-virus tools.
 
 - The victims get infected by visiting web pages which include certain HTML tags that cause the browser to request JavaScript code from a website controlled by the attackers. The JavaScript code attacks the browser and its various components and tries to download an executable to the machine.
 
@@ -72,7 +89,7 @@ How is Torpig distributed:
 - Torpig uses phishing attacks (more on this next lecture)
   - When the victim visits a certain webpage, Torpig contacts an injection server to get another *target domain* which impersonates a valid login page of a site.
   - The user is tricked into input sensitive data in the fake web page.
-  - The communication with injection server is protected with HTPPS, but luckily it doens't authenticate the server's certificate. The defender can launch a man-in-the-middle attack to intercept the communication.
+  - The communication with injection server is protected with HTPPS, but luckily it doesn't authenticate the server's certificate. The defender can launch a man-in-the-middle attack to intercept the communication.
 
 There are four servers here:
 
@@ -107,7 +124,7 @@ There are four servers here:
 
 Communication with the Torpig C&C uses HTTP POST requests:
 
-- The URL for this requests ontains the bot identifier (used for estimation of the botnet size) and a submission header.
+- The URL for this requests contains the bot identifier (used for estimation of the botnet size) and a submission header.
   - The submission header contains key-value pairs that provide basic info about the bot.
   - For example:
     - ts: time stamp when the configuration was last updated
@@ -118,7 +135,7 @@ Communication with the Torpig C&C uses HTTP POST requests:
     - bld/ver: build and version of Torpig
   - ![image-20241012231227704](./assets/image-20241012231227704.png)
 - The body of the requests contains the stolen data.
-  - For example, Torpig can extract email address from email clients like Outlook, which can be used for span purposes.
+  - For example, Torpig can extract email address from email clients like Outlook, which can be used for spam purposes.
   - ![image-20241012231450193](./assets/image-20241012231450193.png)
 
 Botnet size:
