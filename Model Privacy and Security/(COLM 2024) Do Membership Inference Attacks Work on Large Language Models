@@ -6,15 +6,15 @@ This paper introduces MIMIR, a repository that unifies evaluations of MIAs for L
 
 While attacks like LiRA (Carlini et al., 2022) show promise, they require training multiple copies of shadow models, which is often intractable for LLMs. Other stronger assumptions for MIAs include white-box access to the model (i.e., access to model parameters) or access to a ground-truth subset of member/in-distribution non-member samples for training meta-classifiers.
 
-![image-20241104145356264](/Users/huapeichun/Desktop/Paper-Reading/Model Privacy and Security/assets/image-20241104145356264.png)
+![image-20241104145356264](./assets/image-20241104145356264.png)
 
 They choose five models of PYTHIA and five models of PYTHIA-DEDUP with different parameter sizes (160M - 12B), and use seven diverse data sources included in the Pile or use the entire Pile. Members and non-members for each data source are sampled from the train and test sets of Pile.
 
 They report AUC ROC for evaluations, and record TPR@low%FPR to assess performance in high-confidence settings (95% confidence interval shown via shaded regions).
 
-![image-20241104150517093](/Users/huapeichun/Desktop/Paper-Reading/Model Privacy and Security/assets/image-20241104150517093.png)
+![image-20241104150517093](./assets/image-20241104150517093.png)
 
-![image-20241104145439081](/Users/huapeichun/Desktop/Paper-Reading/Model Privacy and Security/assets/image-20241104145439081.png)
+![image-20241104145439081](./assets/image-20241104145439081.png)
 
 No attack AUC is above 0.6 other than Github domain. Overall, <u>reference-based attack</u> performs the best. Larger target model size tends to increase MIA performance. Deduplication of the training data reduces MIA performance.
 
@@ -28,7 +28,7 @@ The failure can be attributed to many reasons:
   - Especially, while keeping the non-members fixed, they sample members for each checkpoint from its most recent 100 steps to remove the impact of recency bias. This elevates MIA noticeably.
   - Initially, the MIA performance is low because the training is warming-up. The following high performance may be due to the low data-to-parameter ratio introducing overfit. Later, after the generalization capability emerges, the MIA falls again.
 
-  ![image-20241104151242968](/Users/huapeichun/Desktop/Paper-Reading/Model Privacy and Security/assets/image-20241104151242968.png)
+  ![image-20241104151242968](./assets/image-20241104151242968.png)
 
   - The pre-training of LLMs is usually 1-epoch. To show that it decreases MIA performance, they perform MIA against Datablations suite trained on subsets of C4. The results confirm the hypothesis.
 
@@ -36,7 +36,7 @@ The failure can be attributed to many reasons:
 
   - They quantify overlap using the percentage of n-gram overlap. For a non-member sample `x`, its overlap with training dataset D is:
 
-    ![image-20241104151825381](/Users/huapeichun/Desktop/Paper-Reading/Model Privacy and Security/assets/image-20241104151825381.png)
+    ![image-20241104151825381](./assets/image-20241104151825381.png)
 
   - They find that even non-members tend to have high overlaps with the popular training sets, sometimes even higher than 75%. Document-level deduplication won't eliminate this intrinsic property of languages.
 
@@ -50,7 +50,7 @@ More recent works report SOTA MIAs that make use of:
 
 - This <u>temporally shifted</u> settings yield higher MIA performances. They speculate that this may be due to changes in languages such as new terminology, ideas, news etc.
 
-  ![image-20241104153851869](/Users/huapeichun/Desktop/Paper-Reading/Model Privacy and Security/assets/image-20241104153851869.png)
+  ![image-20241104153851869](./assets/image-20241104153851869.png)
 
 - They interpret this shift as a change of n-gram overlap distributions. Newer data tend to have lower overlap as a non-member.
 
