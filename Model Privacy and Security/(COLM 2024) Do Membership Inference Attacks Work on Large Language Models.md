@@ -18,7 +18,7 @@ They report AUC ROC for evaluations, and record TPR@low%FPR to assess performanc
 
 No attack AUC is above 0.6 other than Github domain. Overall, <u>reference-based attack</u> performs the best. Larger target model size tends to increase MIA performance. Deduplication of the training data reduces MIA performance.
 
-However, in ablation study, they find that it's very difficult to choose a reference model. It's largely empirical, and even aggregating all reference models perform poorly. A reference model should be trained on the data that is same-distribution but largely disjoint from the training data of the target model. However, this assumption is hard to impose at the scale of pre-training corpora.
+However, in ablation study, they find that it's very difficult to choose a reference model. It's largely empirical, and even aggregating all reference models perform poorly. <u>A reference model should be trained on the data that is same-distribution but largely disjoint from the training data of the target model.</u> However, this assumption is hard to impose at the scale of pre-training corpora.
 
 The failure can be attributed to many reasons:
 
@@ -73,7 +73,7 @@ b) Semantic Distance:
 - These modified samples had score distributions closer to original members
 - However, in high-confidence settings, they were still likely to be classified as non-members. This suggests MIAs might miss important forms of information leakage
 
-They point out, future research works:
+They point out:
 
 - Current membership definitions may not capture all relevant forms of information leakage
 - Need a membership definition that combines both lexical and semantic similarity
