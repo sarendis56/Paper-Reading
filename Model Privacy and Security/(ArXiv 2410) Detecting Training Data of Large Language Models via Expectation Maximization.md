@@ -20,9 +20,9 @@ EM-MIA proposed in this paper:
 ReCaLL by Xie et al., 2024:
 
 - Based on the fact that if `p` is not a member, the log-likelihood of `x`  prefixed by `p` (`x|p`) will have a gap with log-likelihood of simply `x` in terms of membership score.
-  - As an extension from using a single prefix p, averaging the ReCaLL scores on a set of multiple prefixes is possible for an ensemble.
+  - As an extension from using a single prefix `p`, averaging the ReCaLL scores on a set of multiple prefixes.
 - No theoretical analysis why it works
-- Strong prior assumption:
+- Strong attack assumption:
   - The ground truth non-members are available
     - In practical: generating a synthetic prefix using GPT-4o.
     - However, according to their implementation, this method still relies on non-member test data as seed data.
@@ -55,7 +55,7 @@ Finding a better prefix:
     One strategy:
 
     - Assign binary labels using current membership scores `f` and a threshold `τ`
-    - Labels are assigned using `δ(f(x) > τ)` where `x ∈ D_test` (if `f(x) > τ`: assigns 1, o/w assigns 0)
+    - Labels are assigned using `δ(f(x) > τ)` where `x ∈ D_{test}` (if `f(x) > τ`: assigns 1, o/w assigns 0)
     - Calculate AUC-ROC using these approximate labels:
       - `ReCaLL_p(x) = LL(x|p;M) / LL(x;M)`
       - `r(p) = AUC-ROC({(ReCaLL_p(x), δ(f(x) > τ)) | x ∈ D_test})`
@@ -79,6 +79,31 @@ Finding a better prefix:
 
   - Regarding extending the test dataset: see last subsection of section 4. In this work, they choose WikiMIA and OLMoMIA (proposed in Section 5) as `D_{test}`, but it may be extended in future works.
 
+  - My pseudocode implementation:
+
+    ```py
+    f(x) = Min_K_plus_plus(x) for x in D_test
+    while not converged:
+        # Step 1: Update prefix scores
+        for p in D_test:
+            # Method 1: Using binary classification
+            threshold = median(f)  # 50th percentile of current scores
+            binary_labels = [f(x) > threshold for x in D_test]
+            recall_scores = [ReCaLL_p(x) for x in D_test] # ReCaLL_p(x) = LL(x|p;M) / LL(x;M)
+            r(p) = calculate_AUC_ROC(recall_scores, binary_labels)
+            
+            # OR Method 2: Using rank comparison
+            ranks_recall = rank([ReCaLL_p(x) for x in D_test])
+            ranks_membership = rank([f(x) for x in D_test])
+            r(p) = compare_ranks(ranks_recall, ranks_membership)
+        
+        # Step 2: Update membership scores
+        for x in D_test:
+            f(x) = -r(x)
+    ```
+
+    The key insight is that while they don't know which data points are non-members (weaker attack assumption), they can use the relative relationships between different data points' scores to iteratively refine their estimates of both membership and prefix effectiveness.
+
 - OLMoMIA:
 
   ![image-20241110001932618](./assets/image-20241110001932618.png)
@@ -95,3 +120,29 @@ Finding a better prefix:
     - Mix-1: Random members + Hard non-members
       - Aim to simulate the case where test data come from a single cluster.
     - Mix-2: Hard members + Random non-members
+
+KEY FINDINGS in experiments:
+
+1. Method Effectiveness:
+
+   - EM-MIA outperforms existing methods significantly
+
+   - Works well without requiring known non-member data
+
+   - Shows robust performance across different conditions
+
+2. ReCaLL Analysis:
+
+   - Prefix selection significantly impacts performance
+
+   - Random selection not optimal
+
+   - Performance depends heavily on having non-member data
+
+3. Distribution Impact:
+
+   - Performance varies based on distribution overlap between members and non-members
+
+   - Method struggles when distributions heavily overlap (Hard/Random settings)
+
+   - Works best when distributions are distinct (Easy/Medium settings)
