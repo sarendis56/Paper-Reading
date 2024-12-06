@@ -132,7 +132,7 @@ Solving (7) gives the threshold `c_α (y_z)` in Attack S. The threshold doesn't 
 
 ##### Attack P: Model dependent MIA via <u>P</u>opulation Data
 
-Here, we will try to come up with `c_α(θ)` for different targe models.
+Here, we will try to come up with `c_α(θ)` for different target models.
 
 The rationale for this design is to construct an inference attack in a more accurate way by computing it only on the target model (instead of on all shadow models), yet with fewer computations (without the need to train shadow models). Similar works may try to use it to infer membership of Genomics, but no known attacks towards ML.
 

@@ -55,8 +55,8 @@ Several technicalities of this algorithm to note:
   - LOSS attack, Yeom et al. 2018.
   - Recent implementations of reference-based methods (LiRA).
     - Base Reference Model: Uses the pretrained but not fine-tuned version of GPT-2. Requires no additional data or knowledge about training distribution. Utilizes the model's large pretraining corpus to estimate general text complexity
-    - Candidate Reference Models: trained on data similar to but slightly different from target model's training data
-    - Oracle Reference Model: Trained on the same corpora but different subsets as target models. Represents "perfect knowledge" about training data distribution. Most powerful but least realistic scenario: assumes attacker has perfect knowledge of training distribution and high quality samples
+    - Candidate Reference Models: trained on data similar to but slightly different topics (for example, different column in the same newspaper)
+    - Oracle Reference Model: Trained on the same corpora but different subsets as target models. "Perfect knowledge" about training data distribution. Most powerful but least realistic scenario.
   - Training results omitted.
 
 - Main Results:
