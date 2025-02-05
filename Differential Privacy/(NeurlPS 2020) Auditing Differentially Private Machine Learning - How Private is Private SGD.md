@@ -1,6 +1,6 @@
 ### (NeurlPS 2020) Auditing Differentially Private Machine Learning:  How Private is Private SGD?
 
-A differentially private training algorithm ensures that, for any set of training sets, no attacker, no matter how powerful, can learn much more information about a single training example than they could have learned had that example been excluded from the training data.
+A differentially private training algorithm ensures that, for any set of training sets, no attacker can learn much more information about a single training example than they could have learned had that example been excluded from the training data.
 
 As the amount of information is quantified by a <u>privacy parameter ε</u>, relatively large parameters like `ε=2` are not uncommon. However, there is often a gap between the strong formal protections promised by differential privacy and the specific quantitative implications of the choice of ε in practice.
 
