@@ -18,17 +18,13 @@ Implications:
 
 #### Adversarial Capabilities
 
-DP makes **data-set agnostic** guarantees: (ε, δ)-DP must hold for all datasets D, even for pathologically constructed datasets D.
+DP makes **dataset agnostic** guarantees: (ε, δ)-DP must hold for all datasets D, even for pathologically constructed datasets D. This means that typical dataset will suffer from less privacy loss than what is guranteed in the worst case.
 
-> There are also restrictions imposed by the analysis: DP-SGD assumes that the adversary is given all intermediate models, not the the final one. These assumptions is not made because it is necessary to satisfying differential privacy, but because the only way we know how to analyze DP-SGD is through a composition over minibatch iterations, where the adversary learned all intermediate updates.
+> There are also restrictions imposed by the analysis: DP-SGD assumes that the adversary is given **all intermediate models**, not only the the final one. This is because the only way we know how to analyze DP-SGD is through a composition over minibatch iterations, where the adversary learned all intermediate updates. It is unexplored as **will this assumption lead to stronger privacy attacks?**
 
-RQ: does having access to the intermediate model updates allow an adversary to mount an attack that leaks more private information from a deep neural network's training set?
+> Similarly, the analysis in differential privacy assumes the adversary has **direct control of the gradient updates to the model**. Again however, this is often not true in practice: the inputs to a machine learning training pipeline are input examples, not gradients. The gradients are derived from the current model and the *worst-case inputs*. The proofs place the the trust boundary at the gradients simply because it is simpler to analyze the system this way.
 
-> Similarly, the analysis in differential privacy assumes the adversary has direct control of the gradient updates to the model. Again however, this is often not true in practice: the inputs to a machine learning training pipeline are input examples, not gradients. The gradients are derived from the current model and the worst-case inputs. The proofs place the the trust boundary at the gradients simply because it is simpler to analyze the system this way.
-
-RQ: show when doing so would not improve the upper bound, in which case it would be unnecessary to attempt an improvement of the analysis that relaxes this assumption.
-
-- Their work shows cases where restricting the adversary to only control examples (rather than gradients) would not lead to better privacy guarantees - so there's no point in trying to develop new theoretical analysis that makes this restriction.
+Their work shows that **restricting the adversary to only control examples (rather than gradients) would not lead to better privacy guarantees** - so there's no point in trying to develop new theoretical analysis that makes this restriction.
 
 #### Instantiating the DP Adversary
 
@@ -36,11 +32,7 @@ Carlini et al., 2019: training language models with ε = 10^5-DP might be safe i
 
 ![image-20241114133223915](./assets/image-20241114133223915.png)
 
-In the game, the distinguisher will receive both the output of Crafter and the output of the model training process.
-
-- Two datasets by the crafter
-  - When the Crafter is called multiple times, receive output of all runs
-- Final model or a sequence of all models during the training.
+In the game, the distinguisher will receive both the two datasets crafted by the Crafter and the model training process (final model or all intermediate ones).
 
 Kairouz et al., 2015: if M is (ε, δ)-differentially private:
 $$
@@ -52,7 +44,7 @@ With Clopper-Pearson method:
 $$
 \epsilon_{empirical}^{lower} = max(\log \frac{1-\delta-FP^{high}}{FN^{high}}, \log \frac{1-\delta-FN^{high}}{FP^{high}}) \ (2)
 $$
-where FP^high is the high confidence bound for false positive and FN^high is the high confidence bound for false negative.
+where `FP^high` is the high confidence bound for false positive and `FN^high` is the high confidence bound for false negative.
 
 This is a conservative calculation. Even if the adversary were to succeed in all 1000 of the trials, the Clopper-Pearson bound would imply an epsilon lower bound of 5.60, because just observing 0 failures in 1000 trials doesn't mean the true error rate is exactly 0. The Clopper-Pearson method tells us that with 95% confidence, even with 1000 perfect trials:
 
@@ -63,9 +55,9 @@ This is a conservative calculation. Even if the adversary were to succeed in all
 >
 > How to understand the 95% confidence? It means if we were to repeat this experiment many times (each time running 1000 trials and calculating the bounds), about 95% of the time our calculated bound would **contain** the true privacy leakage value.
 >
-> Imagine running the 1000-trial experiment 100 different times Each time we calculate a privacy bound using Clopper-Pearson.
+> Imagine running the 1000-trial experiment 100 different times. Each time we calculate a privacy bound using Clopper-Pearson.
 >
-> In about 95 of those 100 experiments, our calculated bound would be correct (the true privacy leakage would be above our lower bound); in about 5 of those 100 experiments, we might be "unlucky" with our sampling and get a bound that's too high.
+> In about 95 of those 100 experiments, our calculated lower bound would be correct (the true privacy leakage would be above our lower bound); in about 5 of those 100 experiments, we might be "unlucky" with our sampling and get a bound that's too high.
 
 > [!NOTE]
 >
@@ -74,14 +66,14 @@ This is a conservative calculation. Even if the adversary were to succeed in all
 > - False Positive Rate (FP) = 0.02 (20 false positives)
 > - False Negative Rate (FN) = 0.03 (30 false negatives)
 >
-> Using these raw rates in equation (1): ε_empirical = max(log((1-0.00001-0.02)/0.03), log((1-0.00001-0.03)/0.02)) = 3.5
+> Using these raw rates in equation (1): ε_empirical = max(log((1-0.00001-0.02)/0.03), log((1-0.00001-0.03)/0.02)) = **3.5**
 >
 > But with Clopper-Pearson 95% confidence intervals:
 >
 > - FP_high might be 0.031 (upper bound)
 > - FN_high might be 0.043 (upper bound)
 >
-> Using these more conservative bounds in equation (2): ε_lower_empirical = max(log((1-0.00001-0.031)/0.043), log((1-0.00001-0.043)/0.031)) = 3.2
+> Using these more conservative bounds in equation (2): ε_lower_empirical = max(log((1-0.00001-0.031)/0.043), log((1-0.00001-0.043)/0.031)) = **3.2**
 
 #### Experiments
 
