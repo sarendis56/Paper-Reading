@@ -1,4 +1,4 @@
-## (ArXiV 2025) Scaling Laws for Differentially Private Language Models
+## (ArXiv 2025) Scaling Laws for Differentially Private Language Models
 
 This paper aims at understanding the complete picture of the compute-privacy-utility tradeoffs and the optimal training configurations in many settings of training LLM using DP.
 
