@@ -1,4 +1,4 @@
-## (ArXiv 2411) Scaling Up Membership Inference: When and How Attacks Succeed on Large Language Models
+## (NAACL 2025) Scaling Up Membership Inference: When and How Attacks Succeed on Large Language Models
 
 ![image-20241114224501767](./assets/image-20241114224501767.png)
 

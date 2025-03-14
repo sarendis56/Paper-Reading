@@ -1,4 +1,4 @@
-### (ArXiv 2408) Nob-MIAs: Non-biased Membership Inference Attacks Assessment on Large Language Models with Ex-Post Dataset Construction
+### (WISE 2024) Nob-MIAs: Non-biased Membership Inference Attacks Assessment on Large Language Models with Ex-Post Dataset Construction
 
 Setup:
 
