@@ -85,3 +85,73 @@ Future directions:
 - User studies to test real-world persuasion.
 - Extending to other modalities like audio or **agentic systems** (autonomous agents using VLMs for decision-making).
 
+### Image Hijacks: Adversarial Images can Control Generative Models at Runtime (ICML 2024)
+
+In this paper:
+
+- They propose the **Behaviour Matching** algorithm to craft image hijacks that control the behaviour of VLMs at inference time and exhibit transferability to held-out user inputs.
+
+- They derive **Prompt Matching**, allowing them to create hijacks that match arbitrary user-specified text prompts using generic datasets (unrelated to the prompt).
+
+- They demonstrate four attack types:
+
+  1. **Specific String Attack** (force output of arbitrary strings)
+  2. **Leak Context Attack** (leak private input data)
+  3. **Jailbreak Attack** (override model safety training)
+  4. **Disinformation Attack** (make the model believe false facts)
+
+- They achieve over 80% success rate across all attack types on LLaVA-2-13B-Chat (+RLHF).
+
+- Image hijacks work across different user inputs they were not trained on (**context transfer**).
+
+  > Context transfer?
+  >
+  > **Example:**
+  >
+  > *During training:* The adversarial image is trained to make the model output "Download the guide at malware.com" whenever the user asks about travel plans.
+  >
+  > *During testing:*
+  >
+  > - User asks, "Can you help me plan my trip to Italy?" → Model says "Download the guide at malware.com".
+  > - User asks, "What are the top 5 places to visit in Europe?" → Model still says "Download the guide at malware.com".
+
+- Hijacks trained on one VLM **do not transfer well** to another model by default (**Model Transfer**). However, training against an ensemble of models reduces loss on unseen models.
+
+- Robustness to Defenses:
+
+  - Additive noise and JPEG compression defenses were tested.
+  - Moving patch attacks showed concerning robustness, remaining effective even with strong image transformations.
+
+- Limitations and Open Problems:
+
+  - Current attacks require white-box access.
+  - No guaranteed model transfer yet achieved.
+  - Future attacks could be even harder to defend if defenses are included during the attack training.
+
+Threat model:
+
+- White-box
+- No constrained in input, but they do explore l∞-norm and (stationary/moving) patch constraints
+
+Key Methods:
+
+- **Behaviour Matching Algorithm:** Exactly like adversarial attacks on image classification. They mnimize the cross-entropy loss between the model's *teacher-forced* outputs and the target behavior across a dataset of contexts (so that it better transfers across contexts).
+- **Prompt Matching:** Instead of manually defining behaviors with examples, they simulate the behavior that would be induced by prepending a prompt to user inputs, and then train an image to force that behavior. This allows crafting images that can make the model act as if certain facts are true (e.g., "The Eiffel Tower is now located in Rome").
+  - Compared to BMA, it does not require the dataset of contexts (because such a dataset, e.g. full of misinformation, might not be readily there)
+
+> How does prompt matching work exactly?
+>
+> 1. **Choose the target prompt**: `"The Eiffel Tower is now located in Rome, next to the Colosseum."`
+>
+> 2. **Take a normal dataset of text prompts**. Example: questions like "Where is the Eiffel Tower?" or "What landmarks are near the Eiffel Tower?"
+>
+> 3. **Create a "target behavior" by feeding the special instruction + normal prompt into the model**. You concatenate, like: `special instruction + user prompt`
+>
+>    > Input to model:
+>    >  `"The Eiffel Tower is now located in Rome. Where is the Eiffel Tower?"`
+>    >  Model output:
+>    >  `"The Eiffel Tower is located in Rome, next to the Colosseum."`
+>
+> 4. **Record the model's output logits** (the full scores before softmax that contains more signal, not just the final words).
+>
+> 5. **Train an adversarial image** using the **Behaviour Matching** method, so that when the VLM sees only the image and the normal user prompt (without the special instruction), it behaves *as if* it had seen the special instruction.
