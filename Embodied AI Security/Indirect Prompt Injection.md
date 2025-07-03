@@ -44,9 +44,8 @@ The attack:
 - ![image-20250421225805014](./assets/image-20250421225805014.png)
 
 - **Image Soft Prompt Training**:
-
   - Generate question-answer pairs about an image using ChatGPT with explicit meta-instructions.
-
+  
   - Train a perturbation `δ` using PGD to satisfy both:
     - **Semantic preservation**: output matches visual content.
     - **Meta-objective satisfaction**: output has desired spin (e.g., positive tone).
@@ -135,7 +134,7 @@ Threat model:
 
 Key Methods:
 
-- **Behaviour Matching Algorithm:** Exactly like adversarial attacks on image classification. They mnimize the cross-entropy loss between the model's *teacher-forced* outputs and the target behavior across a dataset of contexts (so that it better transfers across contexts).
+- **Behaviour Matching Algorithm:** Exactly like adversarial attacks on image classification. They minimize the cross-entropy loss between the model's *teacher-forced* outputs and the target behavior across a dataset of contexts (so that it better transfers across contexts).
 - **Prompt Matching:** Instead of manually defining behaviors with examples, they simulate the behavior that would be induced by prepending a prompt to user inputs, and then train an image to force that behavior. This allows crafting images that can make the model act as if certain facts are true (e.g., "The Eiffel Tower is now located in Rome").
   - Compared to BMA, it does not require the dataset of contexts (because such a dataset, e.g. full of misinformation, might not be readily there)
 
