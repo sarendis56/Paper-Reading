@@ -4,7 +4,7 @@ This paper addresses the **safety degradation** caused by the inclusion of harmf
 
 The proposed method centers on **identifying safety-critical neurons** and determining whether to **patch them based on the degree of damage** incurred during fine-tuning.
 
-1. **Amplify** an initially aligned model to create a **super-aligned reference model** using LoRA weight extrapolation. If `W_0` (weaker alignment) and `W_a` (medium alignment) are available, derive a stronger aligned model `W_e` using:
+1. **Amplify** an initially aligned model to create a **super-aligned reference model** using **LoRA weight extrapolation**. If `W_0` (weaker alignment) and `W_a` (medium alignment) are available, derive a stronger aligned model `W_e` using:
    $$
    W_e = (1+\beta)W_0 - \beta W_e
    $$
@@ -27,7 +27,7 @@ The proposed method centers on **identifying safety-critical neurons** and deter
    W_h\hat{X_j} \approx USV^T \\
    \hat{W_j} = UU^T W_j
    $$
-   where `\hat{W_j}` is the projection of `W_j` on the its top-r left singular vectors.
+   where `\hat{W_j}` is the projection of `W_j` on the its top-r left singular vectors. After getting `\hat{W_j}`, select the top-k neurons by magnitude.
 
 3. After fine-tuning, find **which layers are significantly degraded in safety** by comparing with a reference model:
 
@@ -47,7 +47,7 @@ The proposed method centers on **identifying safety-critical neurons** and deter
    $$
    S_j = \frac{<W'_{e,j},W'_{t,j}>_F}{||W'_{e,j}||_F \cdot ||W'_{t,j}||_F}
    $$
-   Suppose the rank of layer `j` based on similarity is `r_j`, the pruning probability of the layer is:
+   Suppose the rank of layer `j` based on similarity `S_j` is `r_j`, the pruning probability of the layer is:
    $$
    P_j = P_L + \frac{\delta r_j}{N}
    $$
@@ -55,7 +55,9 @@ The proposed method centers on **identifying safety-critical neurons** and deter
    $$
    \gamma_j \sim Bernoulli(P_j)
    $$
-   Unpruned layers (0) are corrected.
+   Unpruned layers (0) are corrected. Alternatively, we can simply **set a threshold for similarity** to decide which layers to patch.
+
+   This step is based on the fact that layers with low similarity values indicate significant deviations in their safety regions and are candidates for correction.
 
 4. **Neuron-Level Correction (Transplantation)**: if the layer is selected for patching, replace safety-critical neurons with those from the reference model and leave others unchanged.
 
@@ -87,3 +89,4 @@ $$
 - Reduces HS by **38.3% compared to aligned models**.
 - Maintains or slightly improves fine-tuning accuracy.
 
+![image-20250703134307872](./assets/image-20250703134307872.png)

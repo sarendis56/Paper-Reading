@@ -10,9 +10,9 @@ The researchers propose a **dual-perspective approach** that combines:
 
 1. Representation-Level Analysis
 
-- Examines how jailbreak prompts alter the model's perception of harmfulness in its internal representation space, such as by **shift** harmful instructions to appear safe within the **representation clusters**
+- Examines how jailbreak prompts alter the model's perception of harmfulness in its internal representation space, such as by **shifting** harmful instructions to appear safe within the **representation clusters**
 
-- Uses safety probes to classify whether representations are perceived as safe or harmful
+- Uses **safety probes** (binary classifier, linear/cluster/PCA) to classify whether representations are perceived as safe or harmful
 
   ![image-20250703120016256](./assets/image-20250703120016256.png)
 
@@ -44,10 +44,24 @@ Findings:
   - Aligned LLMs contain discernible safety concepts in their representations, with **specific directions** corresponding to affirmation vs. refusal
   - Jailbreak prompts succeed by **deceiving the model's harmfulness perception**
   - Highly deceptive prompts maintain consistent affirmative tone throughout all layers
+
+  ![image-20250703141552639](./assets/image-20250703141552639.png)
+
 - Circuit-Level Vulnerabilities
   - Only a **small subset** of components are critical for safety (e.g., L21H14 for refusal, L26H04 for affirmation in Llama2-7b)
+
+    Refusal score shown: logit difference between positive and negative target tokens to assess each model component’s role in generating safe responses.
+
+    ![image-20250703142443430](./assets/image-20250703142443430.png)
+
   - Key refusal components activate apologetic/rejecting tokens for harmful prompts, while affirmation components activate guiding/informative tokens for safe prompts
+
   - All jailbreak strategies suppress refusal signals and enhance affirmation signals, but to different degrees
+
+    ![image-20250703141613153](./assets/image-20250703141613153.png)
+
+    ![image-20250703141743539](./assets/image-20250703141743539.png)
+
 - Scalability:
   - Increasing model scale doesn't inherently improve robustness against jailbreaks
   - Strong positive correlation (0.64-0.79) between representation deception and circuit activation shifts across all models
