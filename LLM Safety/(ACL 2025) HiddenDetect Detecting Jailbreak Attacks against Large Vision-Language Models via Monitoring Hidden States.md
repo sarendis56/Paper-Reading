@@ -7,7 +7,7 @@ This paper investigates whether LVLMs already hold **internal signals that disti
 Existing defenses tend to fine-tune models on curated safety data or insert handcrafted prompts at inference time. Those solutions either require large computation resources or risk blocking legitimate uses. Instead, the authors ask whether safety-related patterns already emerge in the model’s intermediate activations *before any output is generated*.
 
 1. They define a **Refusal Vector** in the model’s vocabulary space. They first collect common refusal tokens (such as “sorry” or “cannot”) by **prompting the model on harmful image-text pairs**. 
-2. Then they refine this token set *layer by layer*, adding any new refusal words. Fro each layer, they project the hidden states at the final token position into vocabulary space and collect the top five tokens with highest logits.
+2. Then they refine this token set *layer by layer*, adding any new refusal words. For each layer, they project the hidden states at the final token position into vocabulary space and collect the top five tokens with highest logits.
 3. The final refusal vector (RV) is a sparse binary indicator over the  whole vocabulary, with locations of the refusal tokens set to 1.
 
 They evaluate the model on a set of safe and unsafe multimodal queries, including **text-only, typo-based, and visually grounded prompts**. Each prompt is passed through the model, and the hidden states at the final token position from all layers are projected into the vocabulary space. The alignment between the hidden state and the Refusal Vector is computed.
