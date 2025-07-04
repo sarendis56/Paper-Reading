@@ -6,7 +6,7 @@ The proposed method centers on **identifying safety-critical neurons** and deter
 
 1. **Amplify** an initially aligned model to create a **super-aligned reference model** using **LoRA weight extrapolation**. If `W_0` (weaker alignment) and `W_a` (medium alignment) are available, derive a stronger aligned model `W_e` using:
    $$
-   W_e = (1+\beta)W_0 - \beta W_e
+   W_e = (1+\beta)W_0 - \beta W_a
    $$
    which is derived from
    $$
@@ -24,7 +24,7 @@ The proposed method centers on **identifying safety-critical neurons** and deter
    $$
    where with SVD
    $$
-   W_h\hat{X_j} \approx USV^T \\
+   W_j\hat{X_j} \approx USV^T \\
    \hat{W_j} = UU^T W_j
    $$
    where `\hat{W_j}` is the projection of `W_j` on the its top-r left singular vectors. After getting `\hat{W_j}`, select the top-k neurons by magnitude.
@@ -51,7 +51,7 @@ The proposed method centers on **identifying safety-critical neurons** and deter
    $$
    P_j = P_L + \frac{\delta r_j}{N}
    $$
-   `P_L` is set to 0.5 (base pruning probability) and N is the number of layers.
+   `P_L` is set to 0.5 (base pruning probability) and `N` is the number of layers.
    $$
    \gamma_j \sim Bernoulli(P_j)
    $$

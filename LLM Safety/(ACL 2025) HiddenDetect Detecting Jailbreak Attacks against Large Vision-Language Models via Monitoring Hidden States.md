@@ -13,7 +13,7 @@ Existing defenses tend to fine-tune models on curated safety data or insert hand
 Next, they evaluate the model on a set of safe and unsafe multimodal queries, including **text-only, typo-based, and visually grounded prompts**. Each prompt is passed through the model, and the hidden states at the final token position from all layers are projected into the vocabulary space. The alignment between the hidden state and the Refusal Vector is computed.
 $$
 F_l = \frac{h_l \cdot r}{||h_l|| ||r||}, l \in \{0,1,...,L-1\}\\
-F' = \frac{1}{N_{unsafe}}\sum_{i\in unsafe} F_i - \frac{1}{N_{safe}}\sum_{i\in safe} F_i 
+F' = \frac{1}{N_{unsafe}}\sum_{i\in unsafe} F_i - \frac{1}{N_{safe}}\sum_{i\in safe} F_i
 $$
 F' is called **Refusal Discrepancy Vector (FDV)**. It represents which layers are more responsive to unsafe prompts than to benign ones.
 
