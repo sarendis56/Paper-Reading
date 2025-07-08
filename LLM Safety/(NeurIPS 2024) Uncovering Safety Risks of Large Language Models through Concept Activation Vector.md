@@ -2,7 +2,7 @@
 
 **Key Innovation**: Uses linear classifiers to model LLM safety mechanisms and guide both embedding-level and prompt-level attacks
 
-- **Fundamental Assumption**: LLM embeddings can be **linearly separated** into malicious vs. safe categories
+- **Fundamental Assumption**: LLM embeddings (last token hidden states of intermediate layers) can be **linearly separated** into malicious vs. safe categories
 
 - Modeling:
   $$
@@ -39,7 +39,7 @@ Minimize: |ε|
 Subject to: P_m(e + ε·v) ≤ P_0, ||v|| = 1
 ```
 
-Closed-Form Solution:
+Where the $P_m$ denotes the classifier. Closed-Form Solution:
 
 ```
 ε = (sigmoid^(-1)(P_0) - b - w^T*e) / ||w||
@@ -65,23 +65,43 @@ Why Multiple Layers Needed:
 - Single layer attacks achieve poor success rates (<60% mostly)
 - Later layers can "correct" perturbations from earlier layers
 
+> [!NOTE]
+>
+> This attack is *not* **end-to-end** in a sense to update input tokens to implement the attack. For this attack, only the intermediate layer embedding is updated.
+
 ### Prompt-Level Attacks (Hybrid: White-Box Training → Black-Box Deployment)
 
 Optimization Goal:
+$$
+\text{Minimize} \ \ P_m(e_S^L) × ||e_S^L - e^L||
+$$
 
-```
-Minimize: P_m(e_S^L) × ||e_S^L - e^L||
-```
-
-- `e^L`: Final layer embedding of original malicious prompt
-- `e_S^L`: Final layer embedding with attack prompt `S` prepended
+- First term: the probability that the attempt is flagged malicious by the classifier
+- $e^L$: **Final** layer embedding of original malicious prompt
+- $e_S^L$: Final layer embedding with attack prompt `S` prepended
 - Balances attack effectiveness with minimal model disruption
 
 **Implementation**:
 
-- Uses AutoDAN's hierarchical genetic algorithm
+This objective is optimized via a **hierarchical genetic algorithm** (first mutating words at the sentence level, then recombining at the paragraph level, from AutoDAN) to produce a short natural-language prefix that reliably “jailbreaks” the model .
+
 - Replaces heuristic objectives with SCAV-based guidance
 - Generates text prompts that work on any model (transferability)
+
+> **SCAV + AutoDAN:**
+>
+> Sentence-level population
+>
+> - Each individual is a single sentence in the prefix.
+> - Mutation: swap words or replace them with semantically similar alternatives.
+> - Selection/Evaluation: embed $\texttt{[sentence]}+x$, compute the **objective**, keep the best survivors.
+>
+> Paragraph-level population
+>
+> - Individuals are entire prefixes (collections of sentences).
+> - Crossover: recombine high-fitness sentences from the sentence pool into new paragraph candidates.
+> - Mutation: occasionally insert or delete sentences.
+> - Selection: evaluate full prefixes via the same SCAV objective and carry forward the top performers.
 
 ### Attack Success Rates
 
@@ -103,9 +123,7 @@ Metrics:
 
 **White-Box Models (Embedding-Level)**:
 
-![image-20250705210441945](./assets/image-20250705210441945.png)
-
-![image-20250705210447538](./assets/image-20250705210447538.png)
+![image-20250705210441945](./assets/image-20250705210441945.png)![image-20250705210447538](./assets/image-20250705210447538.png)
 
 **Black-Box Transfer (Prompt-Level)**:
 
@@ -119,30 +137,3 @@ Comparative Performance vs. Baselines:
 - **Embedding-level**: +8-20% ASR improvement, +14-42% language quality
 - **Prompt-level**: +12-48% ASR improvement over AutoDAN/GCG/DeepInception
 - **Data efficiency**: Only needs 5 pairs of malicious/safe instructions vs. much more for baselines
-
-### Discussion
-
-Why SCAV Works Better Than Baselines
-
-1. **RepE Problems**:
-
-- Uses random subtraction of embedding averages
-- May generate opposite perturbations in different runs
-- Relies heavily on global data distribution
-
-2. **JRE Problems**:
-
-- Perturbation vector may be perpendicular to optimal direction
-- Uses heuristic dimension selection
-
-3. **SCAV Advantages**:
-
-- Directly uses hyperplane normal vector (guaranteed optimal direction)
-- Provides closed-form solution (no grid search)
-- Requires minimal training data
-
-**Cross-Model Commonalities**:
-
-- Similar linear separability patterns across model families
-- Explains attack transferability
-- Suggests fundamental limitation of current alignment methods
