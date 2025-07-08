@@ -16,12 +16,12 @@ To address these, the authors propose **Sparse Representation Steering (SRE)**, 
 
      ![image-20250706203647081](./assets/image-20250706203647081.png)
 
-     A feature is considered relevant to the desired attribute if it is consistently activated in positive samples `z+` but not in negative ones `z−`. Conversely, features that are consistently activated in `z−` but not in `z+` are identified as representing the opposite direction. The indices of features associated with the desired attribute, denoted as `I+`, and the opposite attribute `I−`, are defined as:
+     A feature is considered relevant to the desired attribute if it is consistently activated in positive samples $z^+$ but not in negative ones $z^-$. Conversely, features that are consistently activated in $z^-$ but not in $z^+$ are identified as representing the opposite direction. The indices of features associated with the desired attribute, denoted as $I^+$, and the opposite attribute $I^−$, are defined as:
      $$
      I_+ = \left\{ j \;|\; \frac{1}{n} \sum_{i=1}^{n} z_+^i[j] > 0,\; \frac{1}{n} \sum_{i=1}^{n} z_-^i[j] = 0 \right\} \\
      I_- = \left\{ j \;|\; \frac{1}{n} \sum_{i=1}^{n} z_-^i[j] > 0,\; \frac{1}{n} \sum_{i=1}^{n} z_+^i[j] = 0 \right\}
      $$
-     For each pair of positive/negative samples `(p_i^+, p_i^-)`, input into the LLM and get the last-token activations `h_i^+, h_i^-`. Then, encode into sparse codes with SAE:
+     *How to get the sparse feature `z` in the first place?* For each pair of positive/negative samples $(p_i^+, p_i^-)$, input into the LLM and get the last-token activations $h_i^+, h_i^-$. Then, encode into sparse codes with SAE:
      $$
      z_i^+ = g_e(h_i^+), z_i^- = g_e(h_i^-)
      $$
