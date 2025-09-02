@@ -84,10 +84,10 @@ What Constitutes a "Function" in FaaS?
 
 - **Unit of execution**: A single entry point (e.g., `handler(event, context)`) that processes one request
 - Lifetime: Typically milliseconds to seconds
-  - Image thumbnail generation (100-500ms)
-  - API gateway request handler (50-200ms)
-  - Database query processor (10-100ms)
-  - ML inference (100ms-2s)
+  - Image thumbnail generation
+  - API gateway request handler
+  - Database query processor
+  - ML inference
 - Each function invocation is isolated. The enclave lifecycle matches the function lifecycle. Cold start happens for each invocation (worst case). This brings:
   - Fault Isolation;
   - Automatic Scaling;
@@ -148,3 +148,30 @@ SEV works at the VM-level instead of process-level, and is therefore more coarse
     - Slots can be sized to fit in L3 cache -> fast for small scale operations
     - Function in Slot A tries to access Slot B's memory -> MPK enforcement (I don't know if MPK exists in AMD actually)
   - Timing side-channels? 🤔
+
+**Q: AMD SEV and Intel SGX are essentially designed for different threat models.**
+
+SGX Threat Model
+
+```
+Trusted:    CPU Package (only the processor die)
+Untrusted:  Everything else (OS, Hypervisor, BIOS, Memory Bus, Other VMs)
+```
+
+SEV/SEV-SNP Threat Model
+
+```
+Trusted:    CPU + Memory Controller + Guest VM
+Untrusted:  Hypervisor, Host OS, Other VMs, Platform Admin
+```
+
+- **SGX**: Protects against **everyone including the OS** inside the enclave
+- **SEV**: Protects against **hypervisor/host** but trusts the guest OS
+
+**Q: Key advantages of SEV?**
+
+- Stateful: for ML models (GBs of weights), Database connections, applications with long sessions etc.
+- Adaptability: the whole software stack is protected, no need for extensive refactoring like SGX.
+- Larger memory: ML models, batch processing (like MapReduce).
+- Lower overhead 🤔: SGX enclaves cannot make system calls, access files, perform network I/O, and thus needs frequent ECALL and OCALL transitions, but SEV protects the whole software stack, so all operations can be done inside the container.
+- ...
