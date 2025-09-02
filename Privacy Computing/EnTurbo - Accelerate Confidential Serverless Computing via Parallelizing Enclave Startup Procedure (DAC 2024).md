@@ -2,7 +2,7 @@
 
 [link to paper](https://dl.acm.org/doi/10.1145/3649329.3658492)
 
-![image-20250902142223307](/Users/huapeichun/Desktop/Paper-Reading/Privacy Computing/assets/image-20250902142223307.png)
+![image-20250902142223307](./assets/image-20250902142223307.png)
 
 The enclave startup procedure consumes 76%-97% of workload lifecycle time in SGXv1 and 43%-97% in SGXv2. The authors identified two key bottlenecks:
 
@@ -17,7 +17,7 @@ They thus propose:
 
    - Uses **Host thread** for copying and execution, **Worker threads** for measurement/verification
 
-   ![image-20250902142349796](/Users/huapeichun/Desktop/Paper-Reading/Privacy Computing/assets/image-20250902142349796.png)
+   ![image-20250902142349796](./assets/image-20250902142349796.png)
 
 2. Parallel Measurement
 
@@ -25,7 +25,7 @@ They thus propose:
 
    - Multiple Worker threads measure different page blocks simultaneously
 
-   ![image-20250902142425685](/Users/huapeichun/Desktop/Paper-Reading/Privacy Computing/assets/image-20250902142425685.png)
+   ![image-20250902142425685](./assets/image-20250902142425685.png)
 
 ### Problem 1: Conflicts Between Threads
 
@@ -35,11 +35,11 @@ They thus propose:
 
 - **Input Conflict**: Deploy serial "Copy-Measure-Execute" page access sequence using VALID and WRLock flags in Enclave Page Cache Map (EPCM) entries. This ensures: (R1) All pages must be copied before being measured. (R2) Writable pages cannot be modified at Execution phase before they are measured by Worker threads.
 
-  ![image-20250902142706007](/Users/huapeichun/Desktop/Paper-Reading/Privacy Computing/assets/image-20250902142706007.png)
+  ![image-20250902142706007](./assets/image-20250902142706007.png)
 
 - **Update Conflict**: Implement Duplicate-Merge mechanism using **Shadow Measurement Cache (SMC)** to store intermediate hash results separately
 
-  ![image-20250902142757881](/Users/huapeichun/Desktop/Paper-Reading/Privacy Computing/assets/image-20250902142757881.png)
+  ![image-20250902142757881](./assets/image-20250902142757881.png)
 
 ### Problem 2: Security Before Verification
 
@@ -51,7 +51,7 @@ They thus propose:
 
 - **Event Blocking**: Prevent information leakage through **Asynchronous Enclave Exit (AEX)** and **OCALL** events using HLT instruction
 
-  ![image-20250902142936044](/Users/huapeichun/Desktop/Paper-Reading/Privacy Computing/assets/image-20250902142936044.png)
+  ![image-20250902142936044](./assets/image-20250902142936044.png)
 
 ### Problem 3: Measurement Security
 
@@ -68,7 +68,7 @@ Testing on SGX simulation mode with confidential serverless workloads:
 
 - Optimal configuration: 8 Worker threads based on empirical analysis. When the number of Work threads exceeds 8, the cost performance of each thread decelerates.
 
-  ![image-20250902143557387](/Users/huapeichun/Desktop/Paper-Reading/Privacy Computing/assets/image-20250902143557387.png)
+  ![image-20250902143557387](./assets/image-20250902143557387.png)
 
 - Performance improvement: 1.42x-6.48x speedup on SGXv1, 1.33x-3.76x on SGXv2
 
@@ -76,7 +76,7 @@ Testing on SGX simulation mode with confidential serverless workloads:
 
 - Hardware overhead: Negligible (uses reserved bits in existing structures)
 
-![image-20250902143418116](/Users/huapeichun/Desktop/Paper-Reading/Privacy Computing/assets/image-20250902143418116.png)![image-20250902143435810](/Users/huapeichun/Desktop/Paper-Reading/Privacy Computing/assets/image-20250902143435810.png)
+![image-20250902143418116](./assets/image-20250902143418116.png)![image-20250902143435810](./assets/image-20250902143435810.png)
 
 ### Thoughts
 
