@@ -76,7 +76,3 @@ The authors benchmarked their work against concurrent solutions (e.g., Bontekoe 
 - **Verity-Auth** is approximately **100x more efficient** than the concurrent work, which requires 1.31 seconds per user compared to Verity-Auth's milliseconds execution.
 - **Verity** (the encrypted version) is computationally expensive due to HE but is the first to provide robustness by keeping randomness encrypted in a non-interactive setting.
 
-```
-https://github-readme-stats.vercel.app/api?username=sarendis56&count_private=true&show_icons=true&theme=tokyonight
-```
-
