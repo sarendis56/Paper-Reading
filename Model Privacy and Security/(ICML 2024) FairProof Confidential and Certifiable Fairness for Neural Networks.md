@@ -16,7 +16,9 @@ FairProof is a system that uses **Zero-Knowledge Proofs (ZKPs)** and cryptograph
 
 The authors leverage a connection between **fairness** and **adversarial robustness**.
 
-1. **Reduction:** Certifying fairness is treated as a robustness problem in $(n-k)$ dimensions, where $k$ is the number of sensitive features. Final fairness certificate is the minimum of ${ε_a, ε_b, ε_c}$. Red color denotes decision boundary. The distance metric can be computed as a weighted l2-norm where the non-sensitive features have weight 1 while the sensitive features have weight 0. In figure (b), simply fix the sensitive feature S and solve for the rest of the non-sensitive features.
+1. **Reduction:** Certifying fairness is treated as a robustness problem in $(n-k)$ dimensions, where $k$ is the number of sensitive features. Final fairness certificate is the minimum of ${ε_a, ε_b, ε_c}$. Red color denotes decision boundary. The distance metric can be computed as a weighted l2-norm where the non-sensitive features have weight 1 while the sensitive features have weight 0.
+
+   In figure (b), simply fix the sensitive feature S and solve for the rest of the non-sensitive features. For a certificate, you must make sure model's prediction is consistent regardless of **any** of the sensitive features (e.g., gender or race). After fixing all k of them, there left a (n-k)-dim space to solve.
 
    ![image-20260122022900087](./assets/image-20260122022900087.png)
 
@@ -146,6 +148,7 @@ The evaluation identified that the **VerifyBoundary** sub-function is the most e
   - **Implication:** A sophisticated adversary might be able to infer information about the model's complexity or the "closeness" of the decision boundary based on how many steps the verification took.
 - To make the math "ZKP-friendly," the system trades exactness for efficiency.
   - **Underestimating Fairness:** The system reports a **lower bound** ($\epsilon_{LB}$) rather than the exact fairness parameter.
+    - This is conservative, so it's **sound (sufficient) but <u>not complete</u> (still underestimated)**.
   - **False Negatives:** Because the estimate is "conservative" (the true fairness is likely higher), a model might actually be fair enough to meet a regulatory standard, but FairProof could report a value that falls below the threshold.
 - Dependency on Tabular Data: rely heavily on tabular data where sensitive features (like "Gender" or "Foreign Worker status") are clearly defined discrete columns.
   - **Unclear Application to Unstructured Data:** The paper does not address how this would work for unstructured data like text or images, where sensitive attributes are latent (e.g., a face in an image) rather than explicit input dimensions.
